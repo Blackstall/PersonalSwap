@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polygon Token Swap</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #swap-container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      background: #000000; /* Black background */
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      color: white;
+    }
+
+    #connect-button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #ff8c00, #ff0080);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    #connect-button:hover {
+      background: linear-gradient(90deg, #ff4500, #e60073);
+    }
+
+    .swap-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #1a1a1a;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border: 1px solid #333;
+    }
+
+    .swap-field input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 16px;
+      margin-right: 10px;
+      color: white;
+    }
+
+    .swap-field input::placeholder {
+      color: #aaa;
+    }
+
+    .swap-field .token-select {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #333;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .swap-field .token-select img {
+      width: 20px;
+      height: 20px;
+    }
+
+    #swap-button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #ff8c00, #ff0080);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    #swap-button:hover {
+      background: linear-gradient(90deg, #ff4500, #e60073);
+    }
+
+    .swap-divider {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 15px 0;
+    }
+
+    .swap-divider i {
+      font-size: 24px;
+      color: #ff8c00;
+      cursor: pointer;
+    }
+
+    /* Custom Alert Styling */
+    #custom-alert {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000000;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      color: white;
+      text-align: center;
+      width: 300px;
+      z-index: 1000;
+    }
+
+    #custom-alert p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    #custom-alert button {
+      padding: 10px 20px;
+      background: linear-gradient(90deg, #ff8c00, #ff0080);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #custom-alert button:hover {
+      background: linear-gradient(90deg, #ff4500, #e60073);
+    }
+
+    #alert-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <div id="swap-container">
+    <button id="connect-button"><i class="fas fa-wallet"></i> Connect Wallet</button>
+
+    <div class="swap-field">
+      <input type="number" id="sell-amount" placeholder="0.0" />
+      <div class="token-select">
+        <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" alt="Polygon Logo" />
+        <span id="sell-token-symbol">Polygon</span>
+      </div>
+    </div>
+
+    <div class="swap-divider"><i class="fas fa-arrows-alt-v"></i></div>
+
+    <div class="swap-field">
+      <input type="number" id="buy-amount" placeholder="0.0" disabled />
+      <div class="token-select">
+        <img src="https://cryptologos.cc/logos/mantra-om-logo.png?v=040" alt="Custom Token Logo" />
+        <span id="buy-token-symbol">Kupang</span>
+      </div>
+    </div>
+
+    <button id="swap-button"><i class="fas fa-exchange-alt"></i> Swap</button>
+  </div>
+
+  <!-- Custom Alert -->
+  <div id="alert-overlay"></div>
+  <div id="custom-alert">
+    <p id="alert-message"></p>
+    <button id="alert-ok">OK</button>
+  </div>
+
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.min.js"></script>
+  <script>
+    const amoyPolygonTestnet = {
+      chainId: "0x13881",
+      chainName: "Amoy Polygon Testnet",
+      rpcUrls: ["https://rpc-amoy.polygon.technology/"],
+      nativeCurrency: {
+        name: "MATIC",
+        symbol: "MATIC",
+        decimals: 18,
+      },
+      blockExplorerUrls: ["https://amoy.polygonscan.com/"],
+    };
+
+    const customTokenAddress = "0xYourTokenAddressHere";
+
+    const connectButton = document.getElementById("connect-button");
+    const swapButton = document.getElementById("swap-button");
+    const customAlert = document.getElementById("custom-alert");
+    const alertOverlay = document.getElementById("alert-overlay");
+    const alertMessage = document.getElementById("alert-message");
+    const alertOkButton = document.getElementById("alert-ok");
+
+    const showAlert = (message) => {
+      alertMessage.textContent = message;
+      customAlert.style.display = "block";
+      alertOverlay.style.display = "block";
+    };
+
+    alertOkButton.addEventListener("click", () => {
+      customAlert.style.display = "none";
+      alertOverlay.style.display = "none";
+    });
+
+    connectButton.addEventListener("click", async () => {
+      if (typeof window.ethereum === "undefined") {
+        showAlert("MetaMask is required!");
+        return;
+      }
+
+      try {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [amoyPolygonTestnet],
+        });
+
+        const accounts = await window.ethereum.request({
+          method: "eth_accounts",
+        });
+        connectButton.innerText = `Connected: ${accounts[0].substring(0, 6)}...`;
+      } catch (error) {
+        console.error("Wallet connection failed:", error);
+      }
+    });
+
+    swapButton.addEventListener("click", () => {
+      const sellAmount = document.getElementById("sell-amount").value;
+
+      if (!sellAmount || parseFloat(sellAmount) <= 0) {
+        showAlert("Please enter a valid amount to swap!");
+        return;
+      }
+
+      showAlert(`Swapping ${sellAmount} MATIC for ${customTokenAddress} on Amoy Testnet (simulation).`);
+    });
+  </script>
+</body>
+</html>
