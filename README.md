@@ -6,7 +6,7 @@ This project is a Polygon Token Swap Interface designed for the Amoy Polygon Tes
 Key Features:
 
 **Network Integration:**
-The app connects to the Amoy Polygon Testnet, which is a testing environment for Polygon (Mumbai) with custom configurations like RPC URL and block explorer.
+The app connects to the Amoy Polygon Testnet, which is a testing environment for Polygon (Amoy) with custom configurations like RPC URL and block explorer.
 Allows users to connect their MetaMask wallet to the Amoy testnet and interact with tokens on this network.
 ERC-20 Token Compatibility:
 
