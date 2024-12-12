@@ -4,22 +4,24 @@
 This project is a Polygon Token Swap Interface designed for the Amoy Polygon Testnet, which allows users to simulate token swaps between MATIC and a custom ERC-20 token deployed on the testnet. The interface is lightweight and focused on providing a user-friendly experience for testing token interactions in a decentralized environment.
 
 Key Features:
-**Network Integration:**
 
+**Network Integration:**
 The app connects to the Amoy Polygon Testnet, which is a testing environment for Polygon (Mumbai) with custom configurations like RPC URL and block explorer.
 Allows users to connect their MetaMask wallet to the Amoy testnet and interact with tokens on this network.
 ERC-20 Token Compatibility:
 
 Users can swap MATIC (native currency of Polygon) for a custom ERC-20 token. This token is defined by its contract address on the testnet.
-**Customizable Design:**
 
+
+**Customizable Design:**
 The design features a sleek, modern UI with a dark theme and gradient buttons.
 Fully responsive and visually consistent with crypto wallet and token platforms.
 Custom Alert System:
 
 A custom modal-style alert replaces the browser's default alert() to provide a better user experience with a polished design.
-**Wallet Integration:**
 
+
+**Wallet Integration:**
 The app integrates seamlessly with MetaMask, allowing users to:
 Connect their wallet.
 Switch networks to the Amoy Polygon Testnet.
